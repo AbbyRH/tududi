@@ -52,6 +52,24 @@ const registrationConfig = {
         : 24,
 };
 
+const oidcConfig = {
+    enabled: process.env.OIDC_ENABLED === 'true',
+    issuer: process.env.OIDC_ISSUER,
+    clientId: process.env.OIDC_CLIENT_ID,
+    clientSecret: process.env.OIDC_CLIENT_SECRET,
+    callbackUrl:
+        process.env.OIDC_CALLBACK_URL ||
+        `${process.env.BACKEND_URL || 'http://localhost:3002'}/api/auth/oidc/callback`,
+    logoutRedirectUrl:
+        process.env.OIDC_LOGOUT_REDIRECT_URL ||
+        process.env.FRONTEND_URL ||
+        'http://localhost:8080',
+    // Role mapping configuration
+    adminRoles: process.env.OIDC_ADMIN_ROLES
+        ? process.env.OIDC_ADMIN_ROLES.split(',').map((r) => r.trim())
+        : ['admin', 'realm-admin'],
+};
+
 const config = {
     allowedOrigins: process.env.TUDUDI_ALLOWED_ORIGINS
         ? process.env.TUDUDI_ALLOWED_ORIGINS.split(',').map((origin) =>
@@ -99,6 +117,8 @@ const config = {
     emailConfig,
 
     registrationConfig,
+
+    oidc: oidcConfig,
 
     uploadPath:
         process.env.TUDUDI_UPLOAD_PATH || path.join(projectRootPath, 'uploads'),

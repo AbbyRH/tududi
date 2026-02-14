@@ -76,6 +76,32 @@ app.use(
     })
 );
 
+// Passport initialization (for OIDC authentication)
+const passport = require('passport');
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport serialization (simple - just store user ID)
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const { User } = require('./models');
+        const user = await User.findByPk(id);
+        done(null, user);
+    } catch (error) {
+        done(error);
+    }
+});
+
+// Setup OIDC strategy if enabled
+const { setupOidcStrategy } = require('./middleware/oidcStrategy');
+setupOidcStrategy().catch((err) => {
+    console.error('Failed to initialize OIDC:', err);
+});
+
 // Static files
 if (config.production) {
     app.use(express.static(path.join(__dirname, 'dist')));

@@ -68,6 +68,7 @@ const Notification = require('./notification')(sequelize);
 const RecurringCompletion = require('./recurringCompletion')(sequelize);
 const TaskAttachment = require('./task_attachment')(sequelize);
 const Backup = require('./backup')(sequelize);
+const OidcUserLink = require('./oidcUserLink')(sequelize);
 
 User.hasMany(Area, { foreignKey: 'user_id' });
 Area.belongsTo(User, { foreignKey: 'user_id' });
@@ -188,6 +189,10 @@ TaskAttachment.belongsTo(Task, { foreignKey: 'task_id' });
 User.hasMany(Backup, { foreignKey: 'user_id', as: 'Backups' });
 Backup.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
 
+// OidcUserLink associations
+User.hasMany(OidcUserLink, { foreignKey: 'user_id' });
+OidcUserLink.belongsTo(User, { foreignKey: 'user_id' });
+
 module.exports = {
     sequelize,
     User,
@@ -208,4 +213,5 @@ module.exports = {
     RecurringCompletion,
     TaskAttachment,
     Backup,
+    OidcUserLink,
 };

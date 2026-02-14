@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Login from './components/Login';
 import Register from './components/Register';
 import NotFound from './components/Shared/NotFound';
+import { OidcCallback } from './components/Auth/OidcCallback';
 import ProjectDetails from './components/Project/ProjectDetails';
 import Projects from './components/Projects';
 import AreaDetails from './components/Area/AreaDetails';
@@ -301,6 +302,10 @@ const App: React.FC = () => {
                     <>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route
+                            path="/auth/oidc/callback"
+                            element={<OidcCallback />}
+                        />
                         <Route
                             path="/"
                             element={<Navigate to="/login" replace />}

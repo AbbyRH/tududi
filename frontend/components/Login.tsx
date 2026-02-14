@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { getApiPath, getAssetPath } from '../config/paths';
+import { checkOidcEnabled } from '../utils/oidcConfig';
+import { OidcLoginButton } from './Auth/OidcLoginButton';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -10,6 +12,8 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [registrationEnabled, setRegistrationEnabled] = useState(false);
+    const [oidcEnabled, setOidcEnabled] = useState(false);
+    const [oidcLoading, setOidcLoading] = useState(false);
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [searchParams] = useSearchParams();
@@ -83,6 +87,19 @@ const Login: React.FC = () => {
         checkRegistration();
     }, []);
 
+    // Check if OIDC is enabled
+    useEffect(() => {
+        const checkOidc = async () => {
+            try {
+                const enabled = await checkOidcEnabled();
+                setOidcEnabled(enabled);
+            } catch (err) {
+                console.error('Error checking OIDC status:', err);
+            }
+        };
+        checkOidc();
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -128,6 +145,12 @@ const Login: React.FC = () => {
             setError('An error occurred. Please try again.');
             console.error('Error during login:', err);
         }
+    };
+
+    const handleOidcLogin = () => {
+        setOidcLoading(true);
+        // Redirect to backend OIDC login endpoint
+        window.location.href = '/api/auth/oidc/login';
     };
 
     return (
@@ -215,6 +238,31 @@ const Login: React.FC = () => {
                                     {t('auth.login', 'Login')}
                                 </button>
                             </form>
+
+                            {/* OIDC Login Option */}
+                            {oidcEnabled && (
+                                <>
+                                    <div className="relative my-6">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                                        </div>
+                                        <div className="relative flex justify-center text-sm">
+                                            <span className="px-2 bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+                                                {t(
+                                                    'auth.or_continue_with',
+                                                    'Or continue with'
+                                                )}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <OidcLoginButton
+                                        onLogin={handleOidcLogin}
+                                        loading={oidcLoading}
+                                    />
+                                </>
+                            )}
+
                             {registrationEnabled && (
                                 <div className="mt-6 text-center text-gray-600 dark:text-gray-400">
                                     {t(
